@@ -257,9 +257,12 @@ object CSRs {
   val reset = 0x51d
   val tohost = 0x51e
   val fromhost = 0x51f
+
+  // Basic counters
   val cycle = 0xc00
   val time = 0xc01
   val instret = 0xc02
+
   val uarch0 = 0xcc0
   val uarch1 = 0xcc1
   val uarch2 = 0xcc2
@@ -277,9 +280,12 @@ object CSRs {
   val uarch14 = 0xcce
   val uarch15 = 0xccf
   val counth = 0x586
+
+  // Basic counters, upper 32 bit.
   val cycleh = 0xc80
   val timeh = 0xc81
   val instreth = 0xc82
+  
   //flexpret
   val clock = fflags
   val slots = badvaddr
