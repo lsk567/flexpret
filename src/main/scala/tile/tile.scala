@@ -106,6 +106,7 @@ class FlexPRETTile(
     this(params, crossing.crossingType, lookup, p)
 
   // Require TileLink nodes
+  // FIXME: What are our TileLink nodes?
   val intOutwardNode = IntIdentityNode()
   val masterNode = visibilityNode
   val slaveNode = TLIdentityNode()
