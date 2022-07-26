@@ -14,7 +14,7 @@ import Core.Causes
 import Core.FlexpretConstants._
 import Core.LoadStore
 
-class Datapath(val debug: Boolean = false)(implicit conf: FlexpretConfiguration) extends Module {
+class Datapath(val debug: Boolean = false, val cyclePrint: Boolean = false)(implicit conf: FlexpretConfiguration) extends Module {
   val io = IO(new Bundle {
     val control = Flipped(new ControlDatapathIO())
     val imem = Flipped(new InstMemCoreIO())
@@ -69,7 +69,9 @@ class Datapath(val debug: Boolean = false)(implicit conf: FlexpretConfiguration)
   val exe_reg_csr_data = Reg(UInt())
 
   // cycle-by-cycle information (spike-dasm)
-  printf(p"[$exe_reg_tid] pc = [0x${Hexadecimal(exe_reg_pc)}] inst = [0x${Hexadecimal(exe_reg_inst)}] DASM(0x${Hexadecimal(exe_reg_inst)})\n")
+  if (cyclePrint) {
+    printf(p"[$exe_reg_tid] pc = [0x${Hexadecimal(exe_reg_pc)}] inst = [0x${Hexadecimal(exe_reg_inst)}] DASM(0x${Hexadecimal(exe_reg_inst)})\n")
+  }
 
   val exe_alu_result = Wire(UInt(32.W))
   io.debugIO.map { b => b.exe_alu_result := exe_alu_result }

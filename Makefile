@@ -49,7 +49,7 @@ include config.mk
 
 # Construct core configuration string (used for directory naming).
 # Note: '?=' not used so string is only constructed once.
-CORE_CONFIG := $(THREADS)t$(if $(findstring true, $(FLEXPRET)),f)-$(ISPM_KBYTES)i-$(DSPM_KBYTES)d$(if $(findstring true, $(MUL)),-mul)-$(SUFFIX)
+CORE_CONFIG := $(THREADS)t$(if $(findstring true, $(FLEXPRET)),f)-$(ISPM_KBYTES)i-$(DSPM_KBYTES)d$(if $(findstring true, $(MUL)),-mul)-$(SUFFIX)-$(CYCLE)
 
 # Default will build target and selected programs.
 all: $(TARGET)
@@ -102,6 +102,7 @@ include $(EMULATOR_DIR)/emulator.mk
 
 # Alias
 emulator: $(EMULATOR_BIN)
+emulator-debug: $(EMULATOR_DEBUG_BIN)
 
 # -----------------------------------------------------------------------------
 #  RISCV tests
@@ -115,6 +116,7 @@ clean:
 	rm -rf $(FPGA_DIR)/generated-src
 	rm -rf $(FPGA_DIR)/build
 	rm -f $(EMULATOR_BIN)
+	rm -f $(EMULATOR_DEBUG_BIN)
 	rm -rf ./build
 	rm -rf emulator/obj_dir
 	rm -f emulator/Core.sim.v
@@ -126,6 +128,7 @@ cleanall:
 	rm -rf $(FPGA_DIR)/generated-src
 	rm -rf $(FPGA_DIR)/build
 	rm -f $(EMULATOR_BIN)
+	rm -f $(EMULATOR_DEBUG_BIN)
 	rm -rf ./build
 	rm -rf emulator/obj_dir
 	rm -f emulator/Core.sim.v

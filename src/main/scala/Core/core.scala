@@ -21,14 +21,15 @@ object FlexpretConfiguration {
    * Parse a given configuration string into a FlexpretConfiguration.
    */
   def parseString(confString: String): FlexpretConfiguration = {
-    val parsed = """(\d+)t(.*)-(\d+)i-(\d+)d.*-(.*)""".r.findFirstMatchIn(confString)
+    val parsed = """(\d+)t(.*)-(\d+)i-(\d+)d.*-(.*)-(.*)""".r.findFirstMatchIn(confString)
     new FlexpretConfiguration(
       parsed.get.group(1).toInt,
       !parsed.get.group(2).isEmpty,
       InstMemConfiguration(bypass=false, parsed.get.group(3).toInt),
       parsed.get.group(4).toInt,
       confString contains "mul",
-      parsed.get.group(5)
+      parsed.get.group(5),
+      parsed.get.group(6).toBoolean
     )
   }
 }
@@ -44,8 +45,9 @@ case class InstMemConfiguration(
 
 case class FlexpretConfiguration(threads: Int, flex: Boolean,
   imemConfig: InstMemConfiguration,
-  dMemKB: Int, mul: Boolean, features: String) {
+  dMemKB: Int, mul: Boolean, features: String, cyclePrint_conf: Boolean) {
   println("features: " + features)
+  println("cyclePrint_conf in core.scala: " + cyclePrint_conf)
   val mt = threads > 1
   val stats = features == "all"
   val (gpioProtection, memProtection, delayUntil, interruptExpire, externalInterrupt, supportedCauses) =
@@ -53,6 +55,8 @@ case class FlexpretConfiguration(threads: Int, flex: Boolean,
     else if (features == "ex") (mt, mt, false, false, true, List(0, 2, 3, 6, 8, 9))
     else if (features == "ti") (mt, mt, true, true, true, List(0, 2, 3, 6, 8, 9))
     else (mt, mt, true, true, true, List(0, 1, 2, 3, 6, 8, 9, 10, 11))
+  val cyclePrint_core : Boolean = cyclePrint_conf
+  println("cyclePrint_core in core.scala: " + cyclePrint_core)
 
   // Design Space Exploration
   val regBrJmp = mt && !flex // delay B*, J* 1 cycle to reduce timing path
@@ -195,7 +199,7 @@ class Core(val confIn: FlexpretConfiguration) extends Module {
   val io = IO(new CoreIO)
 
   val control = Module(new Control())
-  val datapath = Module(new Datapath())
+  val datapath = Module(new Datapath(cyclePrint=conf.cyclePrint_core))
   val imem = if (conf.imemConfig.bypass) None else Some(Module(new ISpm()))
   val dmem = Module(new DSpm())
   //val dmem = Module(new DSpm_BRAM())

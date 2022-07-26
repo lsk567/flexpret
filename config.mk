@@ -28,6 +28,7 @@ SUFFIX ?= ti
 # DEBUG=[true/false]: Generate waveform dump.
 TARGET ?= emulator
 DEBUG ?= true
+CYCLE ?= TRUE
 
 # Default program compilation
 # PROG_DIR=[path]: Directory of programs in tests/ to compile and/or run

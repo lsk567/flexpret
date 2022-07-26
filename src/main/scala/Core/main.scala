@@ -16,6 +16,7 @@ import flexpret.core.FlexpretConfiguration
 object CoreMain {
   def main(args: Array[String]): Unit = {
     val confString = args(0)
+    println("confString: " + confString)
     val chiselArgs = args.slice(1, args.length)
     val coreConfig = FlexpretConfiguration.parseString(confString)
 
