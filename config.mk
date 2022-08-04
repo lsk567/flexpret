@@ -26,6 +26,7 @@ SUFFIX ?= ti
 # Target
 # TARGET=[emulator/fpga]: Select target
 # DEBUG=[true/false]: Generate waveform dump.
+# CYCLE=[true/false]: Print cycle-by-cycle statements.
 TARGET ?= emulator
 DEBUG ?= true
 CYCLE ?= TRUE
