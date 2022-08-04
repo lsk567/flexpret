@@ -31,6 +31,37 @@ end
 
     return contents.replace(orig_str, new_str)
 
+def add_cycle(contents: str) -> str:
+    """
+    cycle-by-cycle
+    """
+    m = re.search(r'module Datapath\([\s\S]+?\);', contents, re.MULTILINE)
+    assert m is not None
+
+    orig_str = m.group()
+    new_str = f"""
+initial begin
+  $value$plusargs("cycle=%s", cycleby);
+  // $display("+cycle = %s", cycleby);
+end
+
+// Initial
+reg [31:0] prev_inst = 32'h0;
+
+always @(posedge clock) begin
+
+  if (cycleby == "true") begin
+    // the default tid is 0
+    $display("[0] pc = [0x%h] inst = [0x%h] DASM(0x%h)", exe_reg_pc, dec_reg_inst, dec_reg_inst);
+  end
+
+  prev_inst <= io_control_dec_inst;
+
+end
+    """
+
+    return contents.replace(orig_str, f"{orig_str} {new_str}")
+
 def add_vcd(contents: str) -> str:
     """
     Add the given filename as a VCD target dump.
@@ -79,6 +110,9 @@ end
 
     return contents.replace(orig_str, f"{orig_str} {vcd_blob}")
 
+'''
+args = ['scripts/hdl/simify_verilog.py', 'build/Core.raw.v']
+'''
 def main(args: List[str]) -> int:
     if len(args) < 2:
         print(f"Usage: {args[0]} Core.v", file=sys.stderr)
@@ -88,6 +122,8 @@ def main(args: List[str]) -> int:
         contents = str(f.read())
 
     contents = "string hex_file_name;\n" + contents
+    contents = "string cycleby;\n" + contents
+    contents = add_cycle(contents)
     contents = add_ispm(contents)
     contents = add_vcd(contents)
 
