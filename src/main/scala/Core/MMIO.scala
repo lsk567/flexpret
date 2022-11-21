@@ -86,8 +86,9 @@ package object core {
 
     override def cloneType: this.type = new MMIOIns(config).asInstanceOf[this.type]
   }
+
   /**
-   * Record that actually represents the I/Os going into the module.
+   * Record that actually represents the I/Os going out of the module.
    */
   class MMIOOuts(val config: Seq[MMIORow]) extends Record {
     MMIORow.checkConfig(config)

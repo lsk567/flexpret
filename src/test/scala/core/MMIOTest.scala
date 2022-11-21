@@ -67,12 +67,14 @@ class MMIOCoreTest extends FlatSpec with ChiselScalatestTester {
 
       waitForDecoupled(c, c.io.readReq)
 
+      // Query address 2 ("inout")
       c.io.readReq.valid.poke(true.B)
       c.io.readReq.bits.poke(2.U)
       c.clock.step()
 
       waitForDecoupled(c, c.io.readReq)
 
+      // Query address 0 (the "input" field)
       c.io.readReq.valid.poke(true.B)
       c.io.readReq.bits.poke(0.U)
       c.clock.step()
@@ -83,12 +85,16 @@ class MMIOCoreTest extends FlatSpec with ChiselScalatestTester {
       while(c.io.readResp.valid.peek().litValue() == 0) {
         c.clock.step()
       }
+      // Data coming back from address 2 (the "inout" field)
+      // should be 1.
       c.io.readResp.bits.addr.expect(2.U)
       c.io.readResp.bits.data.expect(1.U)
       c.clock.step()
       while(c.io.readResp.valid.peek().litValue() == 0) {
         c.clock.step()
       }
+      // Data coming back from address 0 (the "input" field)
+      // should be 3.
       c.io.readResp.bits.addr.expect(0.U)
       c.io.readResp.bits.data.expect(3.U)
     }
@@ -98,6 +104,7 @@ class MMIOCoreTest extends FlatSpec with ChiselScalatestTester {
     waitForDecoupled(c, c.io.write)
 
     timescope {
+      // Write 3 to address 0 (the "input" field)
       c.io.write.valid.poke(true.B)
       c.io.write.bits.addr.poke(0.U)
       c.io.write.bits.data.poke(3.U)
@@ -107,6 +114,7 @@ class MMIOCoreTest extends FlatSpec with ChiselScalatestTester {
     waitForDecoupled(c, c.io.write)
 
     timescope {
+      // Write 2 to address 1 (the "output" field)
       c.io.write.valid.poke(true.B)
       c.io.write.bits.addr.poke(1.U)
       c.io.write.bits.data.poke(2.U)
@@ -116,6 +124,7 @@ class MMIOCoreTest extends FlatSpec with ChiselScalatestTester {
     waitForDecoupled(c, c.io.write)
 
     timescope {
+      // Write 1 to address 2 (the "inout" field)
       c.io.write.valid.poke(true.B)
       c.io.write.bits.addr.poke(2.U)
       c.io.write.bits.data.poke(1.U)
@@ -123,16 +132,20 @@ class MMIOCoreTest extends FlatSpec with ChiselScalatestTester {
     }
     waitForDecoupled(c, c.io.write)
 
+    // The returned data for "output" should be 2.
     c.io.outs.elements("output").expect(2.U)
+    // The returned data for "inout" should be 1.
     c.io.outs.elements("inout").expect(1.U)
 
     timescope {
+      // Write 3 to address 2 ("inout")
       c.io.write.valid.poke(true.B)
       c.io.write.bits.addr.poke(2.U)
       c.io.write.bits.data.poke(3.U)
       c.clock.step()
     }
     waitForDecoupled(c, c.io.write)
+    // The returned data for "inout" should be 3.
     c.io.outs.elements("inout").expect(3.U)
   }
 
